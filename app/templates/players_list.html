@@ -1,17 +1,40 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spielerliste</title>
-</head>
-<body>
-    <h1>Spielerliste</h1>
-    <ul>
+{% extends "base.html" %}
+
+{% block title %}Player List{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Player List</h1>
+
+<table class="table table-striped table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
         {% for player in players %}
-            <li>{{ player.name }}</li>
+        <tr>
+            <td>{{ player.id }}</td>
+            <td>{{ player.name }}</td>
+            <td>
+                <span class="badge {% if player.active %}bg-success{% else %}bg-danger{% endif %}">
+                    {{ 'Active' if player.active else 'Inactive' }}
+                </span>
+            </td>
+            <td>
+                <form action="/players/toggle/{{ player.id }}" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-sm {% if player.active %}btn-danger{% else %}btn-success{% endif %}">
+                        {{ 'Deactivate' if player.active else 'Activate' }}
+                    </button>
+                </form>
+            </td>
+        </tr>
         {% endfor %}
-    </ul>
-    <a href="/">Zurück zur Startseite</a>
-</body>
-</html>
+    </tbody>
+</table>
+
+<a href="/" class="btn btn-secondary mt-3">Back to Home</a>
+{% endblock %}

@@ -1,15 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Padel League</title>
-</head>
-<body>
-    <h1>Willkommen zur Padel League!</h1>
-    <ul>
-        <li><a href="/players">Spielerliste ansehen</a></li>
-        <li><a href="/players/add">Neuen Spieler hinzufügen</a></li>
-    </ul>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-6 mb-4">
+        <div class="card bg-primary text-white shadow">
+            <div class="card-body">
+                Players
+                <div class="text-white-50 small">Manage all your players</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6 mb-4">
+        <div class="card bg-success text-white shadow">
+            <div class="card-body">
+                Games
+                <div class="text-white-50 small">Track game performance</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
