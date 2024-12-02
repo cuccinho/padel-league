@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Game</title>
+    <script>
+        // Function to dynamically disable selected players
+        function updateDropdowns() {
+            // Get all player dropdowns
+            const dropdowns = document.querySelectorAll('select.player-select');
+
+            // Collect all selected player IDs
+            const selectedPlayers = new Set();
+            dropdowns.forEach(dropdown => {
+                if (dropdown.value) {
+                    selectedPlayers.add(dropdown.value);
+                }
+            });
+
+            // Disable options based on selections
+            dropdowns.forEach(dropdown => {
+                const options = dropdown.options;
+                for (let i = 0; i < options.length; i++) {
+                    if (selectedPlayers.has(options[i].value) && dropdown.value !== options[i].value) {
+                        options[i].disabled = true;
+                    } else {
+                        options[i].disabled = false;
+                    }
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>Add a New Game</h1>
+    <form method="POST" oninput="updateDropdowns()">
+        <!-- Team 1 -->
+        <label for="player1">Player 1 (Team 1):</label>
+        <select name="player1" id="player1" class="player-select" required>
+            <option value="" disabled selected>Select a player</option>
+            {% for player in players %}
+            <option value="{{ player.id }}">{{ player.name }}</option>
+            {% endfor %}
+        </select>
+        <br>
+        <label for="player2">Player 2 (Team 1):</label>
+        <select name="player2" id="player2" class="player-select" required>
+            <option value="" disabled selected>Select a player</option>
+            {% for player in players %}
+            <option value="{{ player.id }}">{{ player.name }}</option>
+            {% endfor %}
+        </select>
+        <br>
+
+        <!-- Team 2 -->
+        <label for="player3">Player 1 (Team 2):</label>
+        <select name="player3" id="player3" class="player-select" required>
+            <option value="" disabled selected>Select a player</option>
+            {% for player in players %}
+            <option value="{{ player.id }}">{{ player.name }}</option>
+            {% endfor %}
+        </select>
+        <br>
+        <label for="player4">Player 2 (Team 2):</label>
+        <select name="player4" id="player4" class="player-select" required>
+            <option value="" disabled selected>Select a player</option>
+            {% for player in players %}
+            <option value="{{ player.id }}">{{ player.name }}</option>
+            {% endfor %}
+        </select>
+        <br>
+
+        <!-- Scores -->
+        <label for="score_team1">Score (Team 1):</label>
+        <select name="score_team1" id="score_team1" required>
+            <option value="" disabled selected>Select score</option>
+            {% for score in range(8) %}
+            <option value="{{ score }}">{{ score }}</option>
+            {% endfor %}
+        </select>
+        <br>
+        <label for="score_team2">Score (Team 2):</label>
+        <select name="score_team2" id="score_team2" required>
+            <option value="" disabled selected>Select score</option>
+            {% for score in range(8) %}
+            <option value="{{ score }}">{{ score }}</option>
+            {% endfor %}
+        </select>
+        <br>
+
+        <button type="submit">Add Game</button>
+    </form>
+    <a href="/games">Back to Games List</a>
+</body>
+</html>

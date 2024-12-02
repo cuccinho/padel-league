@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Games List</title>
+</head>
+<body>
+    <h1>List of Games</h1>
+    <table border="1">
+        <tr>
+            <th>Game ID</th>
+            <th>Team 1</th>
+            <th>Team 2</th>
+            <th>Score</th>
+            <th>Date</th>
+        </tr>
+        {% for game in games %}
+        <tr>
+            <td>{{ game.id }}</td>
+            <td>{{ game.team1[0] }} & {{ game.team1[1] }}</td>
+            <td>{{ game.team2[0] }} & {{ game.team2[1] }}</td>
+            <td>{{ game.score_team1 }} - {{ game.score_team2 }}</td>
+            <td>{{ game.date }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <a href="/">Back to Home</a>
+</body>
+</html>
