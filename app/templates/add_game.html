@@ -4,15 +4,20 @@
 
 {% block content %}
 <h1>Add a New Game</h1>
-<form method="POST" oninput="updateDropdowns()">
+
+{% if error %}
+<div class="alert alert-danger">{{ error }}</div>
+{% endif %}
+
+<form method="POST">
     <label for="player1">Player 1 (Team 1):</label>
-    <select name="player1" id="player1" class="player-select" required>
+    <select name="player1" id="player1" class="player-select" onchange="updateDropdowns()" required>
         <option value="" disabled selected>Select a player</option>
         {% for player in players %}
         <option value="{{ player.id }}">{{ player.name }}</option>
         {% endfor %}
     </select>
-    <select name="position1" required>
+    <select name="position1" id="position1" class="position-select" onchange="updateDropdowns()" required>
         <option value="" disabled selected>Position</option>
         <option value="Right">Right</option>
         <option value="Left">Left</option>
@@ -20,13 +25,13 @@
     <br>
 
     <label for="player2">Player 2 (Team 1):</label>
-    <select name="player2" id="player2" class="player-select" required>
+    <select name="player2" id="player2" class="player-select" onchange="updateDropdowns()" required>
         <option value="" disabled selected>Select a player</option>
         {% for player in players %}
         <option value="{{ player.id }}">{{ player.name }}</option>
         {% endfor %}
     </select>
-    <select name="position2" required>
+    <select name="position2" id="position2" class="position-select" onchange="updateDropdowns()" required>
         <option value="" disabled selected>Position</option>
         <option value="Right">Right</option>
         <option value="Left">Left</option>
@@ -34,13 +39,13 @@
     <br>
 
     <label for="player3">Player 1 (Team 2):</label>
-    <select name="player3" id="player3" class="player-select" required>
+    <select name="player3" id="player3" class="player-select" onchange="updateDropdowns()" required>
         <option value="" disabled selected>Select a player</option>
         {% for player in players %}
         <option value="{{ player.id }}">{{ player.name }}</option>
         {% endfor %}
     </select>
-    <select name="position3" required>
+    <select name="position3" id="position3" class="position-select" onchange="updateDropdowns()" required>
         <option value="" disabled selected>Position</option>
         <option value="Right">Right</option>
         <option value="Left">Left</option>
@@ -48,13 +53,13 @@
     <br>
 
     <label for="player4">Player 2 (Team 2):</label>
-    <select name="player4" id="player4" class="player-select" required>
+    <select name="player4" id="player4" class="player-select" onchange="updateDropdowns()" required>
         <option value="" disabled selected>Select a player</option>
         {% for player in players %}
         <option value="{{ player.id }}">{{ player.name }}</option>
         {% endfor %}
     </select>
-    <select name="position4" required>
+    <select name="position4" id="position4" class="position-select" onchange="updateDropdowns()" required>
         <option value="" disabled selected>Position</option>
         <option value="Right">Right</option>
         <option value="Left">Left</option>
@@ -62,15 +67,7 @@
     <br>
 
     <label for="score_team1">Score (Team 1):</label>
-    <select name="score_team1" id="score_team1" required>
-        <option value="" disabled selected>Select score</option>
-        {% for score in range(8) %}
-        <option value="{{ score }}">{{ score }}</option>
-        {% endfor %}
-    </select>
-    <br>
-    <label for="score_team2">Score (Team 2):</label>
-    <select name="score_team2" id="score_team2" required>
+    <select name="score_team1" required>
         <option value="" disabled selected>Select score</option>
         {% for score in range(8) %}
         <option value="{{ score }}">{{ score }}</option>
@@ -78,7 +75,48 @@
     </select>
     <br>
 
-    <button type="submit">Add Game</button>
+    <label for="score_team2">Score (Team 2):</label>
+    <select name="score_team2" required>
+        <option value="" disabled selected>Select score</option>
+        {% for score in range(8) %}
+        <option value="{{ score }}">{{ score }}</option>
+        {% endfor %}
+    </select>
+    <br>
+
+    <button type="submit" class="btn btn-primary">Add Game</button>
 </form>
-<a href="/games">Back to Games List</a>
+
+<a href="/games" class="btn btn-secondary mt-3">Back to Games List</a>
+
+<script>
+    function updateDropdowns() {
+        const selectedPlayers = Array.from(document.querySelectorAll('.player-select'))
+            .map(select => select.value);
+        const selectedPositions = Array.from(document.querySelectorAll('.position-select'))
+            .map(select => select.value);
+
+        document.querySelectorAll('.player-select').forEach(select => {
+            Array.from(select.options).forEach(option => {
+                if (selectedPlayers.includes(option.value) && option.value !== select.value) {
+                    option.disabled = true;
+                } else {
+                    option.disabled = false;
+                }
+            });
+        });
+
+        document.querySelectorAll('.position-select').forEach((select, index) => {
+            const teamIndex = Math.floor(index / 2);
+            const teamPositions = selectedPositions.slice(teamIndex * 2, teamIndex * 2 + 2);
+            Array.from(select.options).forEach(option => {
+                if (teamPositions.includes(option.value) && option.value !== select.value) {
+                    option.disabled = true;
+                } else {
+                    option.disabled = false;
+                }
+            });
+        });
+    }
+</script>
 {% endblock %}

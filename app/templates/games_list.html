@@ -1,59 +1,47 @@
 {% extends "base.html" %}
 {% block content %}
-<h1 class="text-center">Games Dashboard</h1>
+<h1 class="text-center">Games</h1>
 
-<!-- Filter Section -->
-<div class="row mb-4">
-    <div class="col-md-6">
-        <label for="player1">Player 1</label>
-        <select id="player1" class="form-control">
-            <option value="all">All</option>
-            {% for player in players %}
-            <option value="{{ player.id }}">{{ player.name }}</option>
-            {% endfor %}
-        </select>
-    </div>
-    <div class="col-md-6">
-        <label for="player2">Player 2</label>
-        <select id="player2" class="form-control">
-            <option value="all">All</option>
-            {% for player in players %}
-            <option value="{{ player.id }}">{{ player.name }}</option>
-            {% endfor %}
-        </select>
-    </div>
-    <div class="col-md-12 text-right mt-3">
-        <button id="apply-filter" class="btn btn-primary">Apply Filter</button>
-    </div>
-</div>
-
-<!-- Charts Section -->
-<div id="charts-section" class="row mb-4">
-    <div class="col-md-6">
-        <canvas id="winLoseChart"></canvas>
-    </div>
-    <div class="col-md-6">
-        <canvas id="pointsChart"></canvas>
-    </div>
-</div>
-
-<!-- Games Table -->
-<div class="table-responsive">
-    <table id="gamesTable" class="table table-bordered">
+<div class="table-responsive mt-4">
+    <table class="table table-striped" id="gamesTable">
         <thead>
             <tr>
                 <th>Date</th>
-                <th>Team 1</th>
-                <th>Team 2</th>
+                <th>Player 1 (Team 1)</th>
+                <th>Player 2 (Team 1)</th>
+                <th>Player 3 (Team 2)</th>
+                <th>Player 4 (Team 2)</th>
                 <th>Score</th>
+            </tr>
+            <tr>
+                <th>
+                    <select class="filter-select"><option value="">All</option></select>
+                </th>
+                <th>
+                    <select class="filter-select"><option value="">All</option></select>
+                </th>
+                <th>
+                    <select class="filter-select"><option value="">All</option></select>
+                </th>
+                <th>
+                    <select class="filter-select"><option value="">All</option></select>
+                </th>
+                <th>
+                    <select class="filter-select"><option value="">All</option></select>
+                </th>
+                <th>
+                    <select class="filter-select"><option value="">All</option></select>
+                </th>
             </tr>
         </thead>
         <tbody>
             {% for game in games %}
             <tr>
                 <td>{{ game.date.strftime('%d %b %Y') }}</td>
-                <td>{{ game.player1.name }} ({{ game.position1 }}) and {{ game.player2.name }} ({{ game.position2 }})</td>
-                <td>{{ game.player3.name }} ({{ game.position3 }}) and {{ game.player4.name }} ({{ game.position4 }})</td>
+                <td>{{ game.player1.name }} ({{ game.position1 }})</td>
+                <td>{{ game.player2.name }} ({{ game.position2 }})</td>
+                <td>{{ game.player3.name }} ({{ game.position3 }})</td>
+                <td>{{ game.player4.name }} ({{ game.position4 }})</td>
                 <td>{{ game.score_team1 }} - {{ game.score_team2 }}</td>
             </tr>
             {% endfor %}
@@ -61,58 +49,51 @@
     </table>
 </div>
 
+<form method="POST" action="/games/reset">
+    <button type="submit" class="btn btn-danger mt-3">Reset All Games</button>
+</form>
+
 <script>
-    const playerCombinationStats = {{ player_combination_stats | tojson }};
-    const winLoseCtx = document.getElementById('winLoseChart').getContext('2d');
-    const pointsCtx = document.getElementById('pointsChart').getContext('2d');
+    $(document).ready(function () {
+        // Initialize DataTable
+        var table = $('#gamesTable').DataTable({
+            paging: true,
+            info: true,
+            lengthMenu: [10, 25, 50, 100],
+            initComplete: function () {
+                // Add dropdown filters for each column
+                this.api()
+                    .columns()
+                    .every(function () {
+                        var column = this;
+                        var select = $(column.header()).find('.filter-select');
+                        var uniqueValues = new Set();
 
-    // Sample filter for first combination - modify this for dynamic behavior
-    const firstCombo = Object.keys(playerCombinationStats)[0];
-    const firstStats = playerCombinationStats[firstCombo];
+                        // Extract unique values from column data
+                        column
+                            .data()
+                            .each(function (value) {
+                                const text = value.replace(/(<([^>]+)>)/gi, "").trim(); // Strip HTML tags
+                                uniqueValues.add(text);
+                            });
 
-    // Win/Lose Chart
-    new Chart(winLoseCtx, {
-        type: 'pie',
-        data: {
-            labels: ['Wins', 'Losses'],
-            datasets: [{
-                data: [firstStats.wins, firstStats.losses],
-                backgroundColor: ['#4e73df', '#e74a3b']
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { display: true }
-            }
-        }
-    });
+                        // Populate dropdown with unique values
+                        Array.from(uniqueValues)
+                            .sort()
+                            .forEach(function (value) {
+                                select.append(
+                                    `<option value="${value}">${value}</option>`
+                                );
+                            });
 
-    // Points Chart
-    new Chart(pointsCtx, {
-        type: 'pie',
-        data: {
-            labels: ['Points Won', 'Points Lost'],
-            datasets: [{
-                data: [firstStats.points_won, firstStats.points_lost],
-                backgroundColor: ['#1cc88a', '#f6c23e']
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { display: true }
-            }
-        }
-    });
-
-    // Apply filter logic
-    $('#apply-filter').on('click', function () {
-        const player1 = $('#player1').val();
-        const player2 = $('#player2').val();
-
-        // Replace this with real filtering logic
-        console.log(`Filter applied: Player1=${player1}, Player2=${player2}`);
+                        // Apply filter on change
+                        select.on('change', function () {
+                            var val = $.fn.dataTable.util.escapeRegex($(this).val());
+                            column.search(val ? '^' + val + '$' : '', true, false).draw();
+                        });
+                    });
+            },
+        });
     });
 </script>
 {% endblock %}

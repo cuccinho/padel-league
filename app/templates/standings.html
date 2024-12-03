@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="text-center">Player Standings</h1>
+
+<div class="table-responsive mt-4">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Player</th>
+                <th>W</th>
+                <th>L</th>
+                <th>W-R</th>
+                <th>L-R</th>
+                <th>W-L</th>
+                <th>L-L</th>
+                <th>Points Made</th>
+                <th>Points Received</th>
+                <th>Diff</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for player in standings %}
+            <tr>
+                <td>{{ player.name }}</td>
+                <td>{{ player.wins }}</td>
+                <td>{{ player.losses }}</td>
+                <td>{{ player.wins_right }}</td>
+                <td>{{ player.losses_right }}</td>
+                <td>{{ player.wins_left }}</td>
+                <td>{{ player.losses_left }}</td>
+                <td>{{ player.points_made }}</td>
+                <td>{{ player.points_received }}</td>
+                <td>{{ player.diff }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
