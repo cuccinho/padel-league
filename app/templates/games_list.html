@@ -1,63 +1,118 @@
 {% extends "base.html" %}
-
-{% block title %}Games List{% endblock %}
-
 {% block content %}
-<h1 class="mb-4">Games Overview</h1>
+<h1 class="text-center">Games Dashboard</h1>
 
-<h2 class="mb-3">Player Combinations</h2>
-<div class="row">
-    {% for combination, stats in player_combinations.items() %}
-    <div class="col-lg-4 col-md-6">
-        <div class="card mb-3">
-            <div class="card-body">
-                <h5 class="card-title">{{ combination }}</h5>
-                <ul class="list-group">
-                    <li class="list-group-item"><strong>Games Played:</strong> {{ stats.games }}</li>
-                    <li class="list-group-item"><strong>Matches Won:</strong> {{ stats.won }}</li>
-                    <li class="list-group-item"><strong>Matches Lost:</strong> {{ stats.lost }}</li>
-                    <li class="list-group-item"><strong>Points Won:</strong> {{ stats.points_won }}</li>
-                    <li class="list-group-item"><strong>Points Lost:</strong> {{ stats.points_lost }}</li>
-                </ul>
-            </div>
-        </div>
+<!-- Filter Section -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <label for="player1">Player 1</label>
+        <select id="player1" class="form-control">
+            <option value="all">All</option>
+            {% for player in players %}
+            <option value="{{ player.id }}">{{ player.name }}</option>
+            {% endfor %}
+        </select>
     </div>
-    {% endfor %}
+    <div class="col-md-6">
+        <label for="player2">Player 2</label>
+        <select id="player2" class="form-control">
+            <option value="all">All</option>
+            {% for player in players %}
+            <option value="{{ player.id }}">{{ player.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-12 text-right mt-3">
+        <button id="apply-filter" class="btn btn-primary">Apply Filter</button>
+    </div>
 </div>
 
-<h2 class="mt-5">Game Details</h2>
-<table class="table table-bordered table-hover">
-    <thead>
-        <tr>
-            <th>Game ID</th>
-            <th>Team 1</th>
-            <th>Team 2</th>
-            <th>Score</th>
-            <th>Date</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for game in games %}
-        <tr>
-            <td>{{ game.id }}</td>
-            <td>
-                {{ game.team1[0].name }} ({{ game.team1[0].position }}) &
-                {{ game.team1[1].name }} ({{ game.team1[1].position }})
-            </td>
-            <td>
-                {{ game.team2[0].name }} ({{ game.team2[0].position }}) &
-                {{ game.team2[1].name }} ({{ game.team2[1].position }})
-            </td>
-            <td>{{ game.score_team1 }} - {{ game.score_team2 }}</td>
-            <td>{{ game.date }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<!-- Charts Section -->
+<div id="charts-section" class="row mb-4">
+    <div class="col-md-6">
+        <canvas id="winLoseChart"></canvas>
+    </div>
+    <div class="col-md-6">
+        <canvas id="pointsChart"></canvas>
+    </div>
+</div>
 
-<form action="/games/reset" method="POST" class="mt-3">
-    <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to reset all games?');">
-        Reset Games
-    </button>
-</form>
+<!-- Games Table -->
+<div class="table-responsive">
+    <table id="gamesTable" class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Team 1</th>
+                <th>Team 2</th>
+                <th>Score</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for game in games %}
+            <tr>
+                <td>{{ game.date.strftime('%d %b %Y') }}</td>
+                <td>{{ game.player1.name }} ({{ game.position1 }}) and {{ game.player2.name }} ({{ game.position2 }})</td>
+                <td>{{ game.player3.name }} ({{ game.position3 }}) and {{ game.player4.name }} ({{ game.position4 }})</td>
+                <td>{{ game.score_team1 }} - {{ game.score_team2 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    const playerCombinationStats = {{ player_combination_stats | tojson }};
+    const winLoseCtx = document.getElementById('winLoseChart').getContext('2d');
+    const pointsCtx = document.getElementById('pointsChart').getContext('2d');
+
+    // Sample filter for first combination - modify this for dynamic behavior
+    const firstCombo = Object.keys(playerCombinationStats)[0];
+    const firstStats = playerCombinationStats[firstCombo];
+
+    // Win/Lose Chart
+    new Chart(winLoseCtx, {
+        type: 'pie',
+        data: {
+            labels: ['Wins', 'Losses'],
+            datasets: [{
+                data: [firstStats.wins, firstStats.losses],
+                backgroundColor: ['#4e73df', '#e74a3b']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: true }
+            }
+        }
+    });
+
+    // Points Chart
+    new Chart(pointsCtx, {
+        type: 'pie',
+        data: {
+            labels: ['Points Won', 'Points Lost'],
+            datasets: [{
+                data: [firstStats.points_won, firstStats.points_lost],
+                backgroundColor: ['#1cc88a', '#f6c23e']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: true }
+            }
+        }
+    });
+
+    // Apply filter logic
+    $('#apply-filter').on('click', function () {
+        const player1 = $('#player1').val();
+        const player2 = $('#player2').val();
+
+        // Replace this with real filtering logic
+        console.log(`Filter applied: Player1=${player1}, Player2=${player2}`);
+    });
+</script>
 {% endblock %}

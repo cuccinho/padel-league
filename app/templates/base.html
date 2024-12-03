@@ -4,11 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Padel League{% endblock %}</title>
-    <!-- Custom fonts for this template-->
+
+    <!-- Template CSS -->
     <link href="{{ url_for('static', filename='vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/css?family=Nunito:200,300,400,700,800,900" rel="stylesheet">
-    <!-- Custom styles for this template-->
     <link href="{{ url_for('static', filename='css/sb-admin-2.min.css') }}" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="{{ url_for('static', filename='css/custom.css') }}" rel="stylesheet">
 </head>
 <body id="page-top">
     <!-- Page Wrapper -->
@@ -17,73 +19,59 @@
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/">
-                <div class="sidebar-brand-icon rotate-n-15">
-                    <i class="fas fa-table-tennis"></i>
+                <div class="sidebar-brand-icon">
+                    <img src="{{ url_for('static', filename='img/padel-racket.svg') }}" alt="Padel Racket" style="width: 60px; height: 60px;">
                 </div>
                 <div class="sidebar-brand-text mx-3">Padel League</div>
             </a>
+
             <!-- Divider -->
             <hr class="sidebar-divider my-0">
             <!-- Nav Items -->
             <li class="nav-item">
-                <a class="nav-link" href="/">
-                    <i class="fas fa-fw fa-home"></i>
-                    <span>Home</span>
-                </a>
-            </li>
-            <li class="nav-item">
                 <a class="nav-link" href="/players">
-                    <i class="fas fa-fw fa-users"></i>
+                    <i class="fas fa-users"></i>
                     <span>Players</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="/games">
-                    <i class="fas fa-fw fa-list"></i>
+                    <i class="fas fa-chart-line"></i>
                     <span>Games</span>
                 </a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/games/add">
-                    <i class="fas fa-fw fa-plus"></i>
-                    <span>Add Game</span>
-                </a>
-            </li>
         </ul>
+        <!-- End of Sidebar -->
+
         <!-- Content Wrapper -->
         <div id="content-wrapper" class="d-flex flex-column">
             <!-- Main Content -->
             <div id="content">
+                <!-- Topbar -->
                 <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
-                    <!-- Topbar Navbar -->
                     <ul class="navbar-nav ml-auto">
                         <li class="nav-item dropdown no-arrow">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Admin</span>
-                                <img class="img-profile rounded-circle" src="{{ url_for('static', filename='img/undraw_profile.svg') }}">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button">
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Welcome</span>
                             </a>
                         </li>
                     </ul>
                 </nav>
-                <!-- Begin Page Content -->
+                <!-- End of Topbar -->
+
+                <!-- Page Content -->
                 <div class="container-fluid">
                     {% block content %}{% endblock %}
                 </div>
             </div>
-            <!-- Footer -->
-            <footer class="sticky-footer bg-white">
-                <div class="container my-auto">
-                    <div class="copyright text-center my-auto">
-                        <span>© 2024 Padel League</span>
-                    </div>
-                </div>
-            </footer>
         </div>
     </div>
-    <!-- Scripts -->
+
+    <!-- Template JS -->
     <script src="{{ url_for('static', filename='vendor/jquery/jquery.min.js') }}"></script>
     <script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ url_for('static', filename='vendor/jquery-easing/jquery.easing.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/sb-admin-2.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </body>
 </html>

@@ -1,8 +1,8 @@
-"""Initial migration with positions
+"""Initial migration
 
-Revision ID: b0ecfc10bcc3
+Revision ID: 8ebff3e6126e
 Revises: 
-Create Date: 2024-12-02 17:01:07.853014
+Create Date: 2024-12-03 01:13:04.662425
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'b0ecfc10bcc3'
+revision = '8ebff3e6126e'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -22,25 +22,26 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=50), nullable=False),
     sa.Column('active', sa.Boolean(), nullable=True),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('name')
     )
     op.create_table('games',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('player1', sa.Integer(), nullable=False),
+    sa.Column('player1_id', sa.Integer(), nullable=False),
+    sa.Column('player2_id', sa.Integer(), nullable=False),
+    sa.Column('player3_id', sa.Integer(), nullable=False),
+    sa.Column('player4_id', sa.Integer(), nullable=False),
     sa.Column('position1', sa.String(length=10), nullable=False),
-    sa.Column('player2', sa.Integer(), nullable=False),
     sa.Column('position2', sa.String(length=10), nullable=False),
-    sa.Column('player3', sa.Integer(), nullable=False),
     sa.Column('position3', sa.String(length=10), nullable=False),
-    sa.Column('player4', sa.Integer(), nullable=False),
     sa.Column('position4', sa.String(length=10), nullable=False),
     sa.Column('score_team1', sa.Integer(), nullable=False),
     sa.Column('score_team2', sa.Integer(), nullable=False),
     sa.Column('date', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['player1'], ['players.id'], ),
-    sa.ForeignKeyConstraint(['player2'], ['players.id'], ),
-    sa.ForeignKeyConstraint(['player3'], ['players.id'], ),
-    sa.ForeignKeyConstraint(['player4'], ['players.id'], ),
+    sa.ForeignKeyConstraint(['player1_id'], ['players.id'], ),
+    sa.ForeignKeyConstraint(['player2_id'], ['players.id'], ),
+    sa.ForeignKeyConstraint(['player3_id'], ['players.id'], ),
+    sa.ForeignKeyConstraint(['player4_id'], ['players.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###
