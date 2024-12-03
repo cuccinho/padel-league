@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for
+from flask import Blueprint, render_template, request, redirect, url_for, jsonify
 from app.models import Player, Game
 from app.extensions import db
 from datetime import datetime
@@ -230,4 +230,38 @@ def schuldenberger():
         schulden_data=schulden_list,
         total_debt=round(total_debt, 2),
     )
+@main_bp.route('/get_player_combination_stats')
+def get_player_combination_stats():
+    player1 = request.args.get('player1')
+    player2 = request.args.get('player2')
+
+    if not player1 or not player2:
+        return jsonify({'error': 'Both players must be selected'}), 400
+
+    # Filter games based on the selected players and positions
+    games = Game.query.all()
+    wins, losses = 0, 0
+
+    for game in games:
+        team1 = [
+            f"{game.player1.name} ({game.position1})",
+            f"{game.player2.name} ({game.position2})",
+        ]
+        team2 = [
+            f"{game.player3.name} ({game.position3})",
+            f"{game.player4.name} ({game.position4})",
+        ]
+
+        if player1 in team1 and player2 in team1:
+            if game.score_team1 > game.score_team2:
+                wins += 1
+            else:
+                losses += 1
+        elif player1 in team2 and player2 in team2:
+            if game.score_team2 > game.score_team1:
+                wins += 1
+            else:
+                losses += 1
+
+    return jsonify({'wins': wins, 'losses': losses})
 

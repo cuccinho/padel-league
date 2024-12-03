@@ -2,29 +2,48 @@
 {% block content %}
 <h1 class="text-center">Dashboard</h1>
 
-<div class="row">
-    <div class="col-md-6">
-        <h4>Filter Player Combinations</h4>
-        <form id="filter-form">
-            <select id="player1" class="form-control mb-2">
-                <option value="all">All Players</option>
-                {% for player in players %}
-                <option value="{{ player.name }}">{{ player.name }}</option>
-                {% endfor %}
-            </select>
-            <select id="player2" class="form-control mb-2">
-                <option value="all">All Players</option>
-                {% for player in players %}
-                <option value="{{ player.name }}">{{ player.name }}</option>
-                {% endfor %}
-            </select>
-            <button type="button" id="apply-filter" class="btn btn-primary">Apply Filter</button>
-        </form>
+<div class="row justify-content-center">
+    <!-- Filter Section -->
+    <div class="col-md-4">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">Filter Player Combinations</div>
+            <div class="card-body">
+                <form id="filter-form">
+                    <div class="mb-3">
+                        <label for="player1" class="form-label">Player 1:</label>
+                        <select id="player1" class="form-control">
+                            <option value="">Select Player and Position</option>
+                            {% for player in players %}
+                            <option value="{{ player.name }} (Left)">{{ player.name }} (Left)</option>
+                            <option value="{{ player.name }} (Right)">{{ player.name }} (Right)</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="player2" class="form-label">Player 2:</label>
+                        <select id="player2" class="form-control" disabled>
+                            <option value="">Select Player and Position</option>
+                        </select>
+                    </div>
+                    <button type="button" id="apply-filter" class="btn btn-primary w-100">Apply Filter</button>
+                </form>
+            </div>
+        </div>
     </div>
 
+    <!-- Chart Section -->
     <div class="col-md-6">
-        <h4>Pie Chart</h4>
-        <canvas id="playerCombinationChart"></canvas>
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-success text-white">Combination Results</div>
+            <div class="card-body">
+                <canvas id="playerCombinationChart" class="w-100"></canvas>
+                <div id="chart-legend" class="mt-4 text-center">
+                    <p>Total Games: <span id="total-games">0</span></p>
+                    <p>Wins: <span id="total-wins">0</span></p>
+                    <p>Losses: <span id="total-losses">0</span></p>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -32,28 +51,79 @@
     const stats = {{ player_combination_stats | tojson }};
     const ctx = document.getElementById("playerCombinationChart").getContext("2d");
 
-    let currentData = { wins: 0, losses: 0 };
+    let chart;
 
-    const chart = new Chart(ctx, {
-        type: "pie",
-        data: {
-            labels: ["Wins", "Losses"],
-            datasets: [{
-                data: [currentData.wins, currentData.losses],
-                backgroundColor: ["#4CAF50", "#FF5733"]
-            }]
+    function updatePlayer2Options(selectedPlayer1) {
+        const player2Select = document.getElementById("player2");
+        player2Select.innerHTML = '<option value="">Select Player and Position</option>';
+
+        if (selectedPlayer1) {
+            const [selectedName, selectedPosition] = selectedPlayer1.split(" ");
+            const oppositePosition = selectedPosition === "(Left)" ? "(Right)" : "(Left)";
+
+            {% for player in players %}
+            if ("{{ player.name }}" !== selectedName) {
+                player2Select.innerHTML += `<option value="{{ player.name }} ${oppositePosition}">{{ player.name }} ${oppositePosition}</option>`;
+            }
+            {% endfor %}
         }
+
+        player2Select.disabled = false;
+    }
+
+    document.getElementById("player1").addEventListener("change", (e) => {
+        updatePlayer2Options(e.target.value);
     });
 
-    document.getElementById("apply-filter").addEventListener("click", () => {
+    document.getElementById("apply-filter").addEventListener("click", async function () {
         const player1 = document.getElementById("player1").value;
         const player2 = document.getElementById("player2").value;
 
-        const key = `${player1} & ${player2}`;
-        const selectedStats = stats[key] || { wins: 0, losses: 0 };
+        if (!player1 || !player2) {
+            alert("Please select both players and their positions.");
+            return;
+        }
 
-        chart.data.datasets[0].data = [selectedStats.wins, selectedStats.losses];
-        chart.update();
+        const response = await fetch(`/get_player_combination_stats?player1=${encodeURIComponent(player1)}&player2=${encodeURIComponent(player2)}`);
+        const data = await response.json();
+
+        if (data.error) {
+            alert(data.error);
+            return;
+        }
+
+        // Update the chart data
+        if (chart) {
+            chart.destroy();
+        }
+
+        chart = new Chart(ctx, {
+            type: "doughnut",
+            data: {
+                labels: ["Wins", "Losses"],
+                datasets: [
+                    {
+                        data: [data.wins, data.losses],
+                        backgroundColor: ["#4CAF50", "#FF5733"],
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: "bottom",
+                    },
+                },
+                aspectRatio: 1.5,
+                cutout: "60%",
+            },
+        });
+
+        // Update the legend
+        document.getElementById("total-games").textContent = data.wins + data.losses;
+        document.getElementById("total-wins").textContent = data.wins;
+        document.getElementById("total-losses").textContent = data.losses;
     });
 </script>
 {% endblock %}
