@@ -12,6 +12,7 @@
                 <th>Player 3 (Team 2)</th>
                 <th>Player 4 (Team 2)</th>
                 <th>Score</th>
+                <th>Actions</th>
             </tr>
             <tr>
                 <th>
@@ -32,6 +33,7 @@
                 <th>
                     <select class="filter-select"><option value="">All</option></select>
                 </th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -43,6 +45,11 @@
                 <td>{{ game.player3.name }} ({{ game.position3 }})</td>
                 <td>{{ game.player4.name }} ({{ game.position4 }})</td>
                 <td>{{ game.score_team1 }} - {{ game.score_team2 }}</td>
+                <td>
+                    <form method="POST" action="/games/delete/{{ game.id }}" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </td>
             </tr>
             {% endfor %}
         </tbody>

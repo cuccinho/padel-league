@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, jsonify, flash
 from app.models import Player, Game
 from app.extensions import db
 from datetime import datetime
@@ -93,7 +93,9 @@ def add_game():
         )
         db.session.add(new_game)
         db.session.commit()
-        return redirect(url_for("main.games_list"))
+
+        # Pass success message directly to the template
+        return render_template("games_list.html", games=Game.query.all(), players=Player.query.all(), success="Game added successfully.")
 
     return render_template("add_game.html", players=players, error=None)
 
@@ -202,13 +204,11 @@ def schuldenberger():
         point_difference = abs(game.score_team1 - game.score_team2)
 
         if game.score_team1 > game.score_team2:
-            # Team 2 loses; calculate debt and loss points diff for Player 3 and Player 4
             schulden_data[game.player3_id]["debt"] += point_difference * COST_PER_POINT
             schulden_data[game.player4_id]["debt"] += point_difference * COST_PER_POINT
             schulden_data[game.player3_id]["loss_points_diff"] += point_difference
             schulden_data[game.player4_id]["loss_points_diff"] += point_difference
         elif game.score_team2 > game.score_team1:
-            # Team 1 loses; calculate debt and loss points diff for Player 1 and Player 2
             schulden_data[game.player1_id]["debt"] += point_difference * COST_PER_POINT
             schulden_data[game.player2_id]["debt"] += point_difference * COST_PER_POINT
             schulden_data[game.player1_id]["loss_points_diff"] += point_difference
@@ -229,7 +229,9 @@ def schuldenberger():
         "schuldenberger.html",
         schulden_data=schulden_list,
         total_debt=round(total_debt, 2),
+        cost_per_point=COST_PER_POINT  # Pass cost per point to the template
     )
+
 @main_bp.route('/get_player_combination_stats')
 def get_player_combination_stats():
     player1 = request.args.get('player1')
@@ -264,4 +266,12 @@ def get_player_combination_stats():
                 losses += 1
 
     return jsonify({'wins': wins, 'losses': losses})
+
+@main_bp.route("/games/delete/<int:game_id>", methods=["POST"])
+def delete_game(game_id):
+    game = Game.query.get(game_id)
+    if game:
+        db.session.delete(game)
+        db.session.commit()
+    return redirect(url_for("main.games_list"))
 

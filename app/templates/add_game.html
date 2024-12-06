@@ -9,6 +9,11 @@
 <div class="alert alert-danger">{{ error }}</div>
 {% endif %}
 
+<div class="form-check form-switch mb-3">
+    <input class="form-check-input" type="checkbox" id="autoSelectionToggle" checked>
+    <label class="form-check-label" for="autoSelectionToggle">Enable Auto-Selection</label>
+</div>
+
 <form method="POST">
     <label for="player1">Player 1 (Team 1):</label>
     <select name="player1" id="player1" class="player-select" onchange="updateDropdowns()" required>
@@ -91,32 +96,49 @@
 
 <script>
     function updateDropdowns() {
+        const autoSelection = document.getElementById('autoSelectionToggle').checked;
+
+        if (!autoSelection) return;
+
         const selectedPlayers = Array.from(document.querySelectorAll('.player-select'))
             .map(select => select.value);
         const selectedPositions = Array.from(document.querySelectorAll('.position-select'))
             .map(select => select.value);
 
-        document.querySelectorAll('.player-select').forEach(select => {
-            Array.from(select.options).forEach(option => {
-                if (selectedPlayers.includes(option.value) && option.value !== select.value) {
-                    option.disabled = true;
-                } else {
-                    option.disabled = false;
-                }
-            });
-        });
+        // Auto-fill counterpart positions within the same team
+        const position1 = document.getElementById('position1');
+        const position2 = document.getElementById('position2');
+        if (position1.value && !position2.value) {
+            position2.value = position1.value === 'Right' ? 'Left' : 'Right';
+        }
+        if (position2.value && !position1.value) {
+            position1.value = position2.value === 'Right' ? 'Left' : 'Right';
+        }
 
-        document.querySelectorAll('.position-select').forEach((select, index) => {
-            const teamIndex = Math.floor(index / 2);
-            const teamPositions = selectedPositions.slice(teamIndex * 2, teamIndex * 2 + 2);
-            Array.from(select.options).forEach(option => {
-                if (teamPositions.includes(option.value) && option.value !== select.value) {
-                    option.disabled = true;
-                } else {
-                    option.disabled = false;
-                }
-            });
-        });
+        const position3 = document.getElementById('position3');
+        const position4 = document.getElementById('position4');
+        if (position3.value && !position4.value) {
+            position4.value = position3.value === 'Right' ? 'Left' : 'Right';
+        }
+        if (position4.value && !position3.value) {
+            position3.value = position4.value === 'Right' ? 'Left' : 'Right';
+        }
+
+        // Auto-fill Team 2 players only when both Team 1 players are selected
+        const player1 = document.getElementById('player1');
+        const player2 = document.getElementById('player2');
+        const player3 = document.getElementById('player3');
+        const player4 = document.getElementById('player4');
+
+        if (player1.value && player2.value && !player3.value && !player4.value) {
+            const remainingPlayers = Array.from(document.querySelectorAll('.player-select option'))
+                .filter(option => !selectedPlayers.includes(option.value) && option.value);
+
+            if (remainingPlayers.length >= 2) {
+                player3.value = remainingPlayers[0].value;
+                player4.value = remainingPlayers[1].value;
+            }
+        }
     }
 </script>
 {% endblock %}
