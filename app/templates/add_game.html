@@ -14,6 +14,16 @@
     <label class="form-check-label" for="autoSelectionToggle">Enable Auto-Selection</label>
 </div>
 
+<div class="form-check form-switch mb-3">
+    <input class="form-check-input" type="checkbox" id="enableDatePicker" onclick="toggleDatePicker()">
+    <label class="form-check-label" for="enableDatePicker">Enable Date Selection</label>
+</div>
+
+<div id="datePickerDiv" style="display: none;">
+    <label for="matchDate">Match Date:</label>
+    <input type="date" id="matchDate" name="match_date">
+</div>
+
 <form method="POST">
     <label for="player1">Player 1 (Team 1):</label>
     <select name="player1" id="player1" class="player-select" onchange="updateDropdowns()" required>
@@ -95,6 +105,18 @@
 <a href="/games" class="btn btn-secondary mt-3">Back to Games List</a>
 
 <script>
+    function toggleDatePicker() {
+        const datePickerDiv = document.getElementById('datePickerDiv');
+        const dateInput = document.getElementById('matchDate');
+        if (datePickerDiv.style.display === 'none') {
+            datePickerDiv.style.display = 'block';
+            dateInput.required = true;
+        } else {
+            datePickerDiv.style.display = 'none';
+            dateInput.required = false;
+        }
+    }
+
     function updateDropdowns() {
         const autoSelection = document.getElementById('autoSelectionToggle').checked;
 
@@ -105,7 +127,6 @@
         const selectedPositions = Array.from(document.querySelectorAll('.position-select'))
             .map(select => select.value);
 
-        // Auto-fill counterpart positions within the same team
         const position1 = document.getElementById('position1');
         const position2 = document.getElementById('position2');
         if (position1.value && !position2.value) {
@@ -124,7 +145,6 @@
             position3.value = position4.value === 'Right' ? 'Left' : 'Right';
         }
 
-        // Auto-fill Team 2 players only when both Team 1 players are selected
         const player1 = document.getElementById('player1');
         const player2 = document.getElementById('player2');
         const player3 = document.getElementById('player3');

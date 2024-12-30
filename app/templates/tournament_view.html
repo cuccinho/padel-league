@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Tournament {{ tournament.name }} Overview{% endblock %}
+
+{% block content %}
+<h1 class="text-center">Tournament: {{ tournament.name }}</h1>
+
+<!-- Leaderboard Link -->
+<div class="mt-4 text-center">
+    <a href="{{ url_for('main.leaderboard', tournament_id=tournament.id) }}" class="btn btn-primary">
+        View Leaderboard
+    </a>
+</div>
+
+<div class="tab-content mt-4">
+    <!-- Matches Tab -->
+    <div id="matches" role="tabpanel">
+        {% for round_number, games in matches_by_round.items() %}
+        <div class="border rounded mb-4 p-3">
+            <h4>Round {{ round_number }}</h4>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Game</th>
+                        <th>Team 1</th>
+                        <th>Team 2</th>
+                        <th>Score</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for game in games %}
+                    <tr>
+                        <td>Game {{ ((round_number - 1) * 2) + loop.index }}</td> <!-- Unique game numbering -->
+                        <td>{{ game.player1.name }} & {{ game.player2.name }}</td>
+                        <td>{{ game.player3.name }} & {{ game.player4.name }}</td>
+                        <td>
+                            {{ game.score_team1 if game.score_team1 is not none else '-' }}
+                            -
+                            {{ game.score_team2 if game.score_team2 is not none else '-' }}
+                        </td>
+                        <td>
+                            <form method="POST" action="/americano/update/{{ game.id }}" class="d-inline">
+                                <input type="number" name="score_team1" placeholder="Team 1 Score"
+                                    min="0" max="15" value="{{ game.score_team1 or '' }}" required>
+                                <input type="number" name="score_team2" placeholder="Team 2 Score"
+                                    min="0" max="15" value="{{ game.score_team2 or '' }}" required>
+                                <button class="btn btn-primary btn-sm">
+                                    {{ 'Edit' if game.score_team1 is not none and game.score_team2 is not none else 'Update' }}
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Leaderboard for {{ tournament.name }}{% endblock %}
+
+{% block content %}
+<h1 class="text-center">Leaderboard for {{ tournament.name }}</h1>
+
+<table class="table table-bordered mt-4 text-center">
+    <thead>
+        <tr>
+            <th>Player</th>
+            <th>Matches Played</th>
+            <th>Points</th>
+            <th>W</th> <!-- Wins -->
+            <th>L</th> <!-- Losses -->
+            <th>P+</th> <!-- Points Made -->
+            <th>P-</th> <!-- Points Against -->
+            <th>Diff</th> <!-- Point Difference -->
+        </tr>
+    </thead>
+    <tbody>
+        {% for result in leaderboard %}
+        <tr>
+            <td>{{ result.name }}</td>
+            <td>{{ result.matches_played or 0 }}</td>
+            <td>{{ result.points or 0 }}</td>
+            <td>{{ result.wins or 0 }}</td>
+            <td>{{ result.losses or 0 }}</td>
+            <td>{{ result.points_scored or 0 }}</td>
+            <td>{{ result.points_against or 0 }}</td>
+            <td>{{ (result.points_scored or 0) - (result.points_against or 0) }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{{ url_for('main.view_tournament', tournament_id=tournament.id) }}" class="btn btn-primary mt-3">
+    Back to Tournament
+</a>
+{% endblock %}

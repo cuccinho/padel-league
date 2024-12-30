@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Americano Tournaments{% endblock %}
+{% block content %}
+<h1 class="text-center">Americano Tournaments</h1>
+
+<div>
+    <h2>Create New Tournament</h2>
+    <form method="POST" action="/americano/create">
+        <label>Tournament Name</label>
+        <input type="text" name="tournament_name" required>
+
+        <label>Number of Courts</label>
+        <input type="number" name="num_courts" min="1" required>
+
+        <label>Number of Players</label>
+        <select id="num-players" name="num_players" onchange="generatePlayerInputs()" required>
+            <option value="" disabled selected>Select number of players</option>
+            {% for i in range(4, 21) %}  {# Allow 4 to 20 players #}
+            <option value="{{ i }}">{{ i }}</option>
+            {% endfor %}
+        </select>
+
+        <div id="players-container">
+            <!-- Player input fields will be dynamically generated here -->
+        </div>
+
+        <button type="submit">Create</button>
+    </form>
+</div>
+
+<div>
+    <h2>Existing Tournaments</h2>
+    <ul>
+        {% for tournament in tournaments %}
+        <li><a href="/americano/tournament/{{ tournament.id }}">{{ tournament.name }}</a></li>
+        {% endfor %}
+    </ul>
+</div>
+
+<script>
+function generatePlayerInputs() {
+    const numPlayers = document.getElementById("num-players").value;
+    const container = document.getElementById("players-container");
+    container.innerHTML = ""; // Clear existing inputs
+
+    for (let i = 1; i <= numPlayers; i++) {
+        const label = document.createElement("label");
+        label.innerText = `Player ${i} Name`;
+
+        const input = document.createElement("input");
+        input.type = "text";
+        input.name = "player_names";
+        input.required = true;
+
+        const div = document.createElement("div");
+        div.appendChild(label);
+        div.appendChild(input);
+
+        container.appendChild(div);
+    }
+}
+</script>
+{% endblock %}

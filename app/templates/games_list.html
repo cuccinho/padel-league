@@ -39,7 +39,9 @@
         <tbody>
             {% for game in games %}
             <tr>
-                <td>{{ game.date.strftime('%d %b %Y') }}</td>
+                <td>
+                    {{ game.date.strftime('%d %b %Y') if game.date else 'No Date Set' }}
+                </td>
                 <td>{{ game.player1.name }} ({{ game.position1 }})</td>
                 <td>{{ game.player2.name }} ({{ game.position2 }})</td>
                 <td>{{ game.player3.name }} ({{ game.position3 }})</td>
